@@ -9,14 +9,14 @@ usage() {
   cat <<\EOF >&2
 各種言語環境をインストールし、コマンドを実行します。
 
-$HOME/.xsv-anylang または --prefix オプションで指定したディレクトリに
+$HOME/.xsvutils/anylang または --prefix オプションで指定したディレクトリに
 オプションで指定した言語のバージョンをインストールし、PATHを通した上でコマンドを実行します。
 
 Usage:
     anylang [OPTIONS] <COMMAND> [<ARG>...]
 
 Options:
-    --prefx      インストールするディレクトリを指定 (デフォルトは $HOME/.xsv-anylang)
+    --prefx      インストールするディレクトリを指定 (デフォルトは $HOME/.xsvutils/anylang)
     --jdk=<VER>  インストールするopenjdkのバージョンを指定
     --sbt=<VER>  インストールするsbtのバージョンを指定。 --jdk も併せて指定が必要
     --graalvm=<VER>  インストールするGraalVMのバージョンを指定
@@ -59,7 +59,7 @@ while [ "$#" != 0 ]; do
     shift
 done
 
-: "${PREFIX:=$HOME/.xsv-anylang}"
+: "${PREFIX:=$HOME/.xsvutils/anylang}"
 
 ################################################################################
 # JDK
