@@ -20,6 +20,7 @@ Options:
     --jdk=<VER>  インストールするopenjdkのバージョンを指定
     --sbt=<VER>  インストールするsbtのバージョンを指定。 --jdk も併せて指定が必要
     --graalvm=<VER>  インストールするGraalVMのバージョンを指定
+    --rust=<VER> インストールするRustのバージョンを指定
 
 JDK
 ex) --jdk=11
@@ -31,6 +32,9 @@ ex) --sbt=1.2.8
 GraalVM
 https://github.com/oracle/graal/releases
 ex) --graalvm=19.0.2
+
+Rust
+ex) --rust=1.35.0
 EOF
   exit 1
 }
@@ -48,6 +52,9 @@ while [ "$#" != 0 ]; do
             ;;
         --graalvm=* )
             GRAALVM_VERSION="${1#*=}"
+            ;;
+        --rust=* )
+            RUST_VERSION="${1#*=}"
             ;;
         --* )
             echo "Option \`${1}\` is not supported." >&1
@@ -107,6 +114,7 @@ install_jdk() {
     fi
 
     export PATH="$PREFIX/jdk-${JDK_VERSION}/bin:$PATH"
+    export JAVA_HOME="$PREFIX/jdk-${JDK_VERSION}"
 }
 
 ################################################################################
@@ -182,6 +190,24 @@ install_graalvm() {
     fi
 
     export PATH="$PREFIX/graalvm-${GRAALVM_VERSION}/bin:$PATH"
+    export JAVA_HOME="$PREFIX/graalvm-${GRAALVM_VERSION}"
+}
+
+################################################################################
+# Rust
+################################################################################
+
+install_rust() {
+    export RUSTUP_HOME="$PREFIX/rust"
+    export CARGO_HOME="$PREFIX/rust"
+    if [ -x "$RUSTUP_HOME/bin/rustup" ]; then
+        "$RUSTUP_HOME/bin/rustup" self update 2>/dev/null
+    else
+        curl https://sh.rustup.rs -sSf | sh -s -- --no-modify-path -y --default-toolchain none
+    fi
+    if ! "${RUSTUP_HOME}/bin/rustup" toolchain list | grep "$RUST_VERSION"- >/dev/null; then
+        "${RUSTUP_HOME}/bin/rustup" toolchain install "$RUST_VERSION"
+    fi
 }
 
 ################################################################################
@@ -191,16 +217,22 @@ install_graalvm() {
 [ -v JDK_VERSION ] && install_jdk
 [ -v SBT_VERSION ] && install_sbt
 [ -v GRAALVM_VERSION ] && install_graalvm
+[ -v RUST_VERSION ] && install_rust
 
 [ "$#" = 0 ] && usage
 
 cmd="$1"; shift
 
-if ! which "$cmd" >/dev/null; then
-    echo "Not found: $cmd" >&2
-    exit 1
+if [ -v RUST_VERSION ]; then
+    exec "${RUSTUP_HOME}/bin/rustup" run $RUST_VERSION -- "$cmd" "$@"
+else
+    if ! which "$cmd" >/dev/null; then
+        echo "Not found: $cmd" >&2
+        exit 1
+    fi
+
+    exec "$cmd" "$@"
 fi
 
-exec "$cmd" "$@"
 
 ################################################################################

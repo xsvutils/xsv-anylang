@@ -48,10 +48,10 @@ GraalVM の native-image
 - JDK (Java)
 - sbt (Scala)
 - GraalVM
+- Rust
 
 今後対応したい環境は以下
 
-- Rust
 - OCaml
 - Go言語
 - Ruby
