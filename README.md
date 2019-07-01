@@ -5,14 +5,14 @@
 
 ## Usage
 
-    Usage:
-        bash anylang.sh [OPTIONS] <COMMAND> [<ARG>...]
+    $ bash anylang.sh [OPTIONS] <COMMAND> [<ARG>...]
     
     Options:
         --prefx      インストールするディレクトリを指定 (デフォルトは $HOME/.xsvutils/anylang)
         --jdk=<VER>  インストールするopenjdkのバージョンを指定
         --sbt=<VER>  インストールするsbtのバージョンを指定。 --jdk も併せて指定が必要
         --graalvm=<VER>  インストールするGraalVMのバージョンを指定
+        --rust=<VER> インストールするRustのバージョンを指定
 
 
 ## Example
@@ -30,6 +30,8 @@ GraalVM の native-image
     $ bash ./anylang.sh --graalvm=19.0.2 native-image -jar foo.jar
 
 その場でインストールする言語環境に内部でPATHを通してから目的のコマンドを実行する。
+目的のコマンドはなんでもよく、言語環境を直接呼び出さずに
+シェルスクリプトなどから間接的に呼び出すのでも構わない。
 以下の例では `foo.sh` の中でJDKに含まれる各種ツールを参照できる。
 
     $ bash ./anylang.sh --jdk=11 bash ./foo.sh
