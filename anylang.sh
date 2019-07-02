@@ -73,7 +73,7 @@ done
 ################################################################################
 
 install_jdk() {
-    if [ -v GRAALVM_VERSION ]; then
+    if [ "${GRAALVM_VERSION:=x}" != "x" ]; then
         echo "cannot use both --jdk=* and --graalvm=* options" >&2
         exit 1
     fi
@@ -122,7 +122,7 @@ install_jdk() {
 ################################################################################
 
 install_sbt() {
-    if [ ! -v JDK_VERSION ]; then
+    if [ "${JDK_VERSION:=x}" = "x" ]; then
         echo "use --jdk=* option" >&2
         exit 1
     fi
@@ -154,7 +154,7 @@ install_sbt() {
 ################################################################################
 
 install_graalvm() {
-    if [ -v JDK_VERSION ]; then
+    if [ "${JDK_VERSION:=x}" != "x" ]; then
         echo "cannot use both --jdk=* and --graalvm=* options" >&2
         exit 1
     fi
@@ -214,16 +214,16 @@ install_rust() {
 # main
 ################################################################################
 
-[ -v JDK_VERSION ] && install_jdk
-[ -v SBT_VERSION ] && install_sbt
-[ -v GRAALVM_VERSION ] && install_graalvm
-[ -v RUST_VERSION ] && install_rust
+[ "${JDK_VERSION:=x}" != "x" ] && install_jdk
+[ "${SBT_VERSION:=x}" != "x" ] && install_sbt
+[ "${GRAALVM_VERSION:=x}" != "x" ] && install_graalvm
+[ "${RUST_VERSION:=x}" != "x" ] && install_rust
 
 [ "$#" = 0 ] && usage
 
 cmd="$1"; shift
 
-if [ -v RUST_VERSION ]; then
+if [ "${RUST_VERSION:=x}" != "x" ]; then
     exec "${RUSTUP_HOME}/bin/rustup" run $RUST_VERSION -- "$cmd" "$@"
 else
     if ! which "$cmd" >/dev/null; then
