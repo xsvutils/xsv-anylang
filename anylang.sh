@@ -78,20 +78,22 @@ install_jdk() {
         exit 1
     fi
 
-    if [ ! -x "$PREFIX/jdk-${JDK_VERSION}/bin/java" ]; then
-        uname=$(uname)
-        if [ "$uname" = "Darwin" ]; then
-            os_name='osx'
-        elif [ "$uname" = "Linux" ]; then
-            os_name='linux'
-        else
-            echo "Unknown OS: $uname" >&2
-            exit 1
-        fi
+    local uname=$(uname)
+    local os_name
+    if [ "$uname" = "Darwin" ]; then
+        os_name='osx'
+    elif [ "$uname" = "Linux" ]; then
+        os_name='linux'
+    else
+        echo "Unknown OS: $uname" >&2
+        exit 1
+    fi
 
-        tmppath="$PREFIX/jdk-${JDK_VERSION}-$$"
+    if [ ! -x "$PREFIX/jdk-${JDK_VERSION}/bin/java" ]; then
+
+        local tmppath="$PREFIX/jdk-${JDK_VERSION}-$$"
         mkdir -p $tmppath
-        url="https://download.java.net/java/ga/jdk${JDK_VERSION}/openjdk-${JDK_VERSION}_${os_name}-x64_bin.tar.gz"
+        local url="https://download.java.net/java/ga/jdk${JDK_VERSION}/openjdk-${JDK_VERSION}_${os_name}-x64_bin.tar.gz"
 
         echo "cd $tmppath; curl -L $url | tar xzf -"
         (
@@ -113,8 +115,13 @@ install_jdk() {
         rm -rf $tmppath
     fi
 
-    export PATH="$PREFIX/jdk-${JDK_VERSION}/bin:$PATH"
-    export JAVA_HOME="$PREFIX/jdk-${JDK_VERSION}"
+    if [ $os_name = "osx" ]; then
+        export JAVA_HOME="$PREFIX/jdk-${JDK_VERSION}/Contents/Home"
+    else
+        export JAVA_HOME="$PREFIX/jdk-${JDK_VERSION}"
+    fi
+
+    export PATH="${JAVA_HOME}/bin:$PATH"
 }
 
 ################################################################################
