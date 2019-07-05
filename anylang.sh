@@ -25,6 +25,9 @@ Options:
 JDK
 ex) --jdk=11
 
+Scala
+ex) --scala=2.13.0
+
 sbt
 https://www.scala-sbt.org/download.html
 ex) --sbt=1.2.8
@@ -46,6 +49,9 @@ while [ "$#" != 0 ]; do
             ;;
         --jdk=* )
             JDK_VERSION="${1#*=}"
+            ;;
+        --scala=* )
+            SCALA_VERSION="${1#*=}"
             ;;
         --sbt=* )
             SBT_VERSION="${1#*=}"
@@ -122,6 +128,41 @@ install_jdk() {
     fi
 
     export PATH="${JAVA_HOME}/bin:$PATH"
+}
+
+################################################################################
+# Scala
+################################################################################
+
+install_scala() {
+    if [ "${JDK_VERSION:=x}" = "x" ]; then
+        echo "use --jdk=* option" >&2
+        exit 1
+    fi
+
+    if [ ! -x "$PREFIX/scala-${SCALA_VERSION}/bin/scala" ]; then
+
+        local tmppath="$PREFIX/scala-${SCALA_VERSION}-$$"
+        mkdir -p $tmppath
+        local url="https://downloads.lightbend.com/scala/${SCALA_VERSION}/scala-${SCALA_VERSION}.tgz"
+
+        echo "cd $tmppath; curl -L $url | tar xzf -"
+        (
+            cd $tmppath
+            curl -L $url | tar xzf -
+        )
+        if [ ! -e "$PREFIX/scala-${SCALA_VERSION}/bin/scala" ]; then
+            if [ -e "$PREFIX/scala-${SCALA_VERSION}" ]; then
+                rm -rf "$PREFIX/scala-${SCALA_VERSION}"
+            fi
+            echo mv $tmppath/scala-$SCALA_VERSION "$PREFIX/scala-${SCALA_VERSION}"
+            mv $tmppath/scala-$SCALA_VERSION "$PREFIX/scala-${SCALA_VERSION}"
+        fi
+        rm -rf $tmppath
+    fi
+
+    export SCALA_HOME="$PREFIX/scala-${SCALA_VERSION}"
+    export PATH="${SCALA_HOME}/bin:$PATH"
 }
 
 ################################################################################
@@ -222,6 +263,7 @@ install_rust() {
 ################################################################################
 
 [ "${JDK_VERSION:=x}" != "x" ] && install_jdk
+[ "${SCALA_VERSION:=x}" != "x" ] && install_scala
 [ "${SBT_VERSION:=x}" != "x" ] && install_sbt
 [ "${GRAALVM_VERSION:=x}" != "x" ] && install_graalvm
 [ "${RUST_VERSION:=x}" != "x" ] && install_rust

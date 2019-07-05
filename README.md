@@ -10,6 +10,7 @@
     Options:
         --prefx      インストールするディレクトリを指定 (デフォルトは $HOME/.xsvutils/anylang)
         --jdk=<VER>  インストールするopenjdkのバージョンを指定
+        --scala=<VER>  インストールするScalaのバージョンを指定
         --sbt=<VER>  インストールするsbtのバージョンを指定。 --jdk も併せて指定が必要
         --graalvm=<VER>  インストールするGraalVMのバージョンを指定
         --rust=<VER> インストールするRustのバージョンを指定
@@ -20,6 +21,10 @@
 Java
 
     $ bash ./anylang.sh --jdk=11 java -jar foo.jar
+
+Scala
+
+    $ bash ./anylang.sh --jdk=11 --scala=2.13.0 scala foo.scala
 
 sbt
 
