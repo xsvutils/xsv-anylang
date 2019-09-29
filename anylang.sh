@@ -99,7 +99,19 @@ install_jdk() {
 
         local tmppath="$PREFIX/jdk-${JDK_VERSION}-$$"
         mkdir -p $tmppath
-        local url="https://download.java.net/java/ga/jdk${JDK_VERSION}/openjdk-${JDK_VERSION}_${os_name}-x64_bin.tar.gz"
+        local url=
+        if [ $JDK_VERSION = 11 ]; then
+            url="https://download.java.net/java/ga/jdk11/openjdk-11_${os_name}-x64_bin.tar.gz"
+        elif [ $JDK_VERSION = 12 ]; then
+            url="https://download.java.net/java/GA/jdk12.0.2/e482c34c86bd4bf8b56c0b35558996b9/10/GPL/openjdk-12.0.2_${os_name}-x64_bin.tar.gz"
+        elif [ $JDK_VERSION = 13 ]; then
+            url="https://download.java.net/java/GA/jdk13/5b8a42f3905b406298b72d750b6919f6/33/GPL/openjdk-13_${os_name}-x64_bin.tar.gz"
+        elif [ $JDK_VERSION = 14 ]; then
+            url="https://download.java.net/java/early_access/jdk14/16/GPL/openjdk-14-ea+16_${os_name}-x64_bin.tar.gz"
+        else
+            echo "Unknown JDK version: $JDK_VERSION" >&2
+            exit 1
+        fi
 
         echo "cd $tmppath; curl -L $url | tar xzf -"
         (
